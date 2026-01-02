@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const router = express.Router();
-
+//updated jwt
 // REGISTER
 router.post("/register", async (req, res) => {
   try {

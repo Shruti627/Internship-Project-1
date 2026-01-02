@@ -1,11 +1,16 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { checkAuth } from "../utils/auth";
 
 export default function ProtectedRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [allowed, setAllowed] = useState(null);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    checkAuth().then(setAllowed);
+  }, []);
+
+  if (allowed === null) return null;
+  if (!allowed) return <Navigate to="/login" />;
 
   return children;
 }

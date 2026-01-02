@@ -1,48 +1,38 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      navigate("/login");
-    } else {
-      setUser(storedUser);
-    }
-  }, [navigate]);
-
-  const logout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
-  if (!user) return null; // prevent rendering before user is loaded
-
   return (
-  <div className="min-h-screen flex justify-center items-center bg-gradient-to-r from-blue-500 to-purple-600 px-4">
-    <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md text-center border border-gray-200">
-      
-      <h1 className="text-3xl font-extrabold text-gray-800 mb-2">
-        Welcome, <span className="text-purple-600">{user.name}</span> 👋
-      </h1>
+    <>
+      <Navbar />
 
-      <p className="text-gray-500 text-sm mb-6">
-        Logged in as <span className="font-medium">{user.email}</span>
-      </p>
+      <div className="min-h-screen bg-slate-50 p-10">
+        <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+        <p className="text-slate-600 mb-10">
+          You are authenticated using JWT 🎯
+        </p>
 
-      <div className="h-[1px] bg-gray-200 mb-6"></div>
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
+          {[
+            ["JWT Auth", "Bearer token based authentication"],
+            ["Security", "Helmet, rate limiting enabled"],
+            ["Collaboration", "Git version control learning"],
+          ].map(([title, desc], i) => (
+            <div key={i} className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-xl font-semibold mb-2">{title}</h3>
+              <p className="text-slate-600">{desc}</p>
+            </div>
+          ))}
+        </div>
 
-      <button
-        onClick={logout}
-        className="w-full py-3 bg-red-500 text-white rounded-xl font-semibold tracking-wide hover:bg-red-600 active:scale-95 transition-all duration-200 shadow-md"
-      >
-        Logout
-      </button>
-    </div>
-  </div>
-);
-
+        <div className="bg-white p-8 rounded-xl shadow max-w-3xl">
+          <h2 className="text-2xl font-bold mb-4">Project Objective</h2>
+          <p className="text-slate-600 leading-relaxed">
+            This project demonstrates secure JWT authentication, protected
+            routes, and frontend-backend integration while practicing
+            Git collaboration and industry-level code structure.
+          </p>
+        </div>
+      </div>
+    </>
+  );
 }

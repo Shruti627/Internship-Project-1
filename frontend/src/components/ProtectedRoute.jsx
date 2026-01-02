@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { checkAuth } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
-  const [allowed, setAllowed] = useState(null);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    checkAuth().then(setAllowed);
-  }, []);
-
-  if (allowed === null) return null;
-  if (!allowed) return <Navigate to="/login" />;
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" />;
 
   return children;
 }

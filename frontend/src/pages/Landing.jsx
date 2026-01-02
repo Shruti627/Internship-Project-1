@@ -2,54 +2,64 @@ import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-rose-50 to-amber-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 text-white">
 
-      <nav className="flex justify-between px-10 py-6">
-        <h1 className="text-2xl font-bold">TrustAuth</h1>
-        <div className="space-x-4">
-          <Link to="/login" className="text-slate-700 hover:underline">
+      {/* NAV */}
+      <nav className="flex justify-between items-center px-12 py-6">
+        <h1 className="text-2xl font-bold tracking-wide">
+          CipherGate
+        </h1>
+        <div className="space-x-6">
+          <Link to="/login" className="opacity-80 hover:opacity-100">
             Login
           </Link>
           <Link
             to="/register"
-            className="bg-slate-800 text-white px-5 py-2 rounded-lg"
+            className="bg-cyan-500 text-black px-5 py-2 rounded-lg
+                       hover:bg-cyan-400 transition"
           >
             Get Started
           </Link>
         </div>
       </nav>
 
-      <section className="max-w-6xl mx-auto px-6 py-28 grid md:grid-cols-2 gap-16 items-center">
-        <div>
-          <h2 className="text-5xl font-extrabold mb-6">
-            JWT Authentication<br />
-            done <span className="text-sky-600">right</span>
+      {/* HERO */}
+      <section className="max-w-6xl mx-auto px-12 pt-28 grid md:grid-cols-2 gap-16">
+        <div className="animate-fade-in">
+          <h2 className="text-5xl font-extrabold leading-tight mb-6">
+            Secure Access <br />
+            with <span className="text-cyan-400">CipherGate</span>
           </h2>
-          <p className="text-lg text-slate-600 mb-10">
-            A collaborative MERN project focused on secure authentication,
-            industry standards, and clean design — built for learning
-            version control and real-world practices.
+
+          <p className="text-slate-300 text-lg mb-10">
+            A production-grade authentication system implementing JWT,
+            refresh tokens, session invalidation, and protected APIs —
+            built for real-world security.
           </p>
 
           <Link
             to="/register"
-            className="bg-slate-800 text-white px-8 py-3 rounded-xl text-lg"
+            className="inline-block bg-white text-black px-8 py-3
+                       rounded-xl text-lg hover:scale-105 transition"
           >
-            Start Learning
+            Start Exploring
           </Link>
         </div>
 
-        <div className="bg-white p-10 rounded-3xl shadow space-y-6">
+        {/* FEATURES */}
+        <div className="space-y-6">
           {[
-            "JWT with Bearer Tokens",
-            "Secure Express Backend",
-            "Protected Routes",
-            "Git Collaboration Ready",
-            "Industry Folder Structure",
-          ].map((text, i) => (
-            <div key={i} className="flex gap-3 items-center">
-              <span className="text-green-500">✔</span>
-              <p className="text-slate-700">{text}</p>
+            "JWT Access & Refresh Tokens",
+            "Session Invalidation",
+            "Secure API Protection",
+            "Git Collaboration Ready"
+          ].map((item) => (
+            <div
+              key={item}
+              className="bg-white/10 backdrop-blur p-5 rounded-xl
+                         hover:translate-x-2 transition"
+            >
+              ✔ {item}
             </div>
           ))}
         </div>

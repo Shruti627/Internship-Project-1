@@ -2,63 +2,58 @@ import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-indigo-900 via-purple-900 to-black text-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-rose-50 to-amber-50">
 
-      {/* NAVBAR */}
-      <div className="flex justify-between items-center py-6 px-6 max-w-7xl mx-auto w-full">
-        <div className="text-2xl font-bold hover:text-indigo-400 transition">
-          MERN Auth
-        </div>
-
-        <div className="hidden md:flex gap-6 items-center text-gray-300">
-          <Link to="/" className="hover:text-white transition">Home</Link>
-          <Link to="/login">
-            <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-300">
-              Login
-            </button>
+      <nav className="flex justify-between px-10 py-6">
+        <h1 className="text-2xl font-bold">TrustAuth</h1>
+        <div className="space-x-4">
+          <Link to="/login" className="text-slate-700 hover:underline">
+            Login
           </Link>
-          <Link to="/register">
-            <button className="px-4 py-2 border border-gray-400 hover:bg-white hover:text-black rounded-lg transition-all duration-300">
-              Register
-            </button>
+          <Link
+            to="/register"
+            className="bg-slate-800 text-white px-5 py-2 rounded-lg"
+          >
+            Get Started
           </Link>
         </div>
-      </div>
+      </nav>
 
-      {/* HERO SECTION */}
-      <div className="flex flex-col justify-center items-center text-center flex-1 px-6">
+      <section className="max-w-6xl mx-auto px-6 py-28 grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 className="text-5xl font-extrabold mb-6">
+            JWT Authentication<br />
+            done <span className="text-sky-600">right</span>
+          </h2>
+          <p className="text-lg text-slate-600 mb-10">
+            A collaborative MERN project focused on secure authentication,
+            industry standards, and clean design — built for learning
+            version control and real-world practices.
+          </p>
 
-        <p className="uppercase tracking-widest text-sm text-gray-300 mb-3">
-          Secure & Modern Authentication
-        </p>
-
-        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-          Welcome to <span className="text-indigo-400">MERN Auth</span>
-        </h1>
-
-        <p className="text-gray-300 mt-4 text-lg max-w-2xl">
-          Build and manage your accounts securely and effortlessly. 
-          Register, Login & access your personalized dashboard in seconds.
-        </p>
-
-        <div className="mt-10 flex flex-col sm:flex-row gap-6 justify-center">
-          <Link to="/login">
-            <button className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition-all duration-300 shadow-lg hover:scale-105">
-              Login
-            </button>
-          </Link>
-          <Link to="/register">
-            <button className="px-8 py-3 rounded-xl border border-gray-400 hover:bg-white hover:text-black transition-all duration-300 shadow-lg hover:scale-105">
-              Register
-            </button>
+          <Link
+            to="/register"
+            className="bg-slate-800 text-white px-8 py-3 rounded-xl text-lg"
+          >
+            Start Learning
           </Link>
         </div>
 
-        <p className="mt-12 text-gray-400 text-sm">
-          Already have an account? <Link to="/login" className="text-indigo-400 font-semibold hover:underline">Login Now</Link>
-        </p>
-      </div>
-      
+        <div className="bg-white p-10 rounded-3xl shadow space-y-6">
+          {[
+            "JWT with Bearer Tokens",
+            "Secure Express Backend",
+            "Protected Routes",
+            "Git Collaboration Ready",
+            "Industry Folder Structure",
+          ].map((text, i) => (
+            <div key={i} className="flex gap-3 items-center">
+              <span className="text-green-500">✔</span>
+              <p className="text-slate-700">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

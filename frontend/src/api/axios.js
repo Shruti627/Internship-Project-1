@@ -23,6 +23,15 @@ api.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config;
 
+    // ⛔ Do NOT retry auth endpoints
+    if (
+      originalRequest.url.includes("/auth/login") ||
+      originalRequest.url.includes("/auth/register") ||
+      originalRequest.url.includes("/auth/refresh")
+    ) {
+      return Promise.reject(err);
+    }
+
     if (
       err.response?.status === 401 &&
       !originalRequest._retry
@@ -37,7 +46,8 @@ api.interceptors.response.use(
         );
 
         setAccessToken(res.data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
+        originalRequest.headers.Authorization =
+          `Bearer ${res.data.accessToken}`;
 
         return api(originalRequest);
       } catch {

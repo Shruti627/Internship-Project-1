@@ -4,30 +4,31 @@ import api, { setAccessToken as setAxiosToken } from "../api/axios";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const logout = async () => {
-    await api.post("/auth/logout");
-    setAccessToken(null);
-    setAxiosToken(null);   // 🔑 SYNC HERE
-    setUser(null);
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // ignore
+    } finally {
+      setAxiosToken(null);
+      setUser(null);
+    }
   };
 
+  // 🔁 Restore session ONLY on first app load
   useEffect(() => {
     const initAuth = async () => {
       try {
         const res = await api.post("/auth/refresh");
-
-        setAccessToken(res.data.accessToken);
-        setAxiosToken(res.data.accessToken); // 🔑 SYNC HERE
+        setAxiosToken(res.data.accessToken);
 
         const me = await api.get("/auth/me");
         setUser(me.data);
       } catch {
-        setAccessToken(null);
-        setAxiosToken(null); // 🔑 SYNC HERE
+        setAxiosToken(null);
         setUser(null);
       } finally {
         setLoading(false);
@@ -38,9 +39,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{ user, logout, loading }}
-    >
+    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -7,7 +7,7 @@ const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-/* TOKEN HELPERS */
+/* ===== Helpers ===== */
 const createAccessToken = (id) =>
   jwt.sign({ id }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_EXPIRE
@@ -17,6 +17,8 @@ const createRefreshToken = (id) =>
   jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRE
   });
+
+const isProd = process.env.NODE_ENV === "production";
 
 /* ================= REGISTER ================= */
 router.post("/register", async (req, res) => {
@@ -31,11 +33,7 @@ router.post("/register", async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await User.create({
-    name,
-    email,
-    password: hashedPassword
-  });
+  await User.create({ name, email, password: hashedPassword });
 
   res.status(201).json({
     success: true,
@@ -51,31 +49,27 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
 
   const user = await User.findOne({ email });
-  if (!user)
-    return res.status(401).json({ message: "Invalid credentials" });
+  if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
   const match = await bcrypt.compare(password, user.password);
-  if (!match)
-    return res.status(401).json({ message: "Invalid credentials" });
+  if (!match) return res.status(401).json({ message: "Invalid credentials" });
 
   const accessToken = createAccessToken(user._id);
   const refreshToken = createRefreshToken(user._id);
 
   await Token.create({ userId: user._id, token: refreshToken });
 
+  // ✅ Environment-aware cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: false
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
   });
 
   res.json({
     success: true,
     accessToken,
-    user: {
-      name: user.name,
-      email: user.email
-    }
+    user: { name: user.name, email: user.email }
   });
 });
 
@@ -90,23 +84,23 @@ router.post("/refresh", async (req, res) => {
   if (!storedToken)
     return res.status(403).json({ message: "Invalid refresh token" });
 
-  jwt.verify(
-    refreshToken,
-    process.env.JWT_REFRESH_SECRET,
-    (err, decoded) => {
-      if (err)
-        return res.status(403).json({ message: "Expired refresh token" });
+  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Expired refresh token" });
 
-      const accessToken = createAccessToken(decoded.id);
-      res.json({ accessToken });
-    }
-  );
+    const accessToken = createAccessToken(decoded.id);
+    res.json({ accessToken });
+  });
 });
 
 /* ================= LOGOUT ================= */
 router.post("/logout", async (req, res) => {
   await Token.deleteOne({ token: req.cookies.refreshToken });
-  res.clearCookie("refreshToken");
+
+  res.clearCookie("refreshToken", {
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+  });
+
   res.json({ success: true, message: "Logged out successfully" });
 });
 

@@ -6,8 +6,9 @@ const Token = require("../models/Token");
 const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
+const isProd = process.env.NODE_ENV === "production";
 
-/* ===== Helpers ===== */
+/* ===== Token Helpers ===== */
 const createAccessToken = (id) =>
   jwt.sign({ id }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_EXPIRE
@@ -17,8 +18,6 @@ const createRefreshToken = (id) =>
   jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRE
   });
-
-const isProd = process.env.NODE_ENV === "production";
 
 /* ================= REGISTER ================= */
 router.post("/register", async (req, res) => {
@@ -59,17 +58,21 @@ router.post("/login", async (req, res) => {
 
   await Token.create({ userId: user._id, token: refreshToken });
 
-  // ✅ Environment-aware cookie
+  // ✅ Cookie config works for local + prod
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     sameSite: isProd ? "none" : "lax",
     secure: isProd,
+    path: "/"
   });
 
   res.json({
     success: true,
     accessToken,
-    user: { name: user.name, email: user.email }
+    user: {
+      name: user.name,
+      email: user.email
+    }
   });
 });
 
@@ -85,7 +88,8 @@ router.post("/refresh", async (req, res) => {
     return res.status(403).json({ message: "Invalid refresh token" });
 
   jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ message: "Expired refresh token" });
+    if (err)
+      return res.status(403).json({ message: "Expired refresh token" });
 
     const accessToken = createAccessToken(decoded.id);
     res.json({ accessToken });
@@ -97,8 +101,10 @@ router.post("/logout", async (req, res) => {
   await Token.deleteOne({ token: req.cookies.refreshToken });
 
   res.clearCookie("refreshToken", {
+    httpOnly: true,
     sameSite: isProd ? "none" : "lax",
     secure: isProd,
+    path: "/"
   });
 
   res.json({ success: true, message: "Logged out successfully" });

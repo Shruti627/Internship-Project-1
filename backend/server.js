@@ -13,6 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// ✅ CORS — works for localhost + Vercel
 app.use(
   cors({
     origin: [
@@ -32,13 +33,13 @@ app.use(
   })
 );
 
-/* ===== DB ===== */
+/* ===== Database ===== */
 connectDB();
 
 /* ===== Routes ===== */
 app.use("/api/auth", require("./routes/authRoutes"));
 
-/* ===== Health Check ===== */
+/* ===== Health Check (optional but useful) ===== */
 app.get("/", (req, res) => {
   res.send("API running 🚀");
 });

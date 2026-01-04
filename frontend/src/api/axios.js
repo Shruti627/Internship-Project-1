@@ -1,8 +1,10 @@
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + "/api",
-  withCredentials: true,
+  baseURL: API_URL + "/api",
+  withCredentials: true
 });
 
 let accessToken = null;
@@ -11,6 +13,7 @@ export const setAccessToken = (token) => {
   accessToken = token;
 };
 
+/* ===== REQUEST INTERCEPTOR ===== */
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -18,25 +21,29 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+/* ===== RESPONSE INTERCEPTOR ===== */
 api.interceptors.response.use(
-  (res) => res,
-  async (err) => {
-    const originalRequest = err.config;
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
+    /* ❌ If already retried or auth routes → stop */
     if (
+      originalRequest._retry ||
       originalRequest.url.includes("/auth/login") ||
       originalRequest.url.includes("/auth/register") ||
       originalRequest.url.includes("/auth/refresh")
     ) {
-      return Promise.reject(err);
+      return Promise.reject(error);
     }
 
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    /* 🔄 Try refresh once */
+    if (error.response?.status === 401) {
       originalRequest._retry = true;
 
       try {
         const res = await axios.post(
-          import.meta.env.VITE_API_URL + "/api/auth/refresh",
+          API_URL + "/api/auth/refresh",
           {},
           { withCredentials: true }
         );
@@ -46,12 +53,13 @@ api.interceptors.response.use(
           `Bearer ${res.data.accessToken}`;
 
         return api(originalRequest);
-      } catch {
+      } catch (err) {
+        setAccessToken(null);
         window.location.href = "/login";
       }
     }
 
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 

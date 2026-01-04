@@ -13,18 +13,22 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+const allowedOrigins = [
+  "http://localhost:5173",            // local frontend
+  "https://your-frontend.vercel.app" // replace with actual Vercel URL
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",          // local frontend
-      "https://your-frontend.vercel.app" // Vercel frontend (replace later)
-    ],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
   })
 );
 
 app.use(helmet());
-
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

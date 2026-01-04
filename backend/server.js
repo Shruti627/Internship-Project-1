@@ -13,38 +13,38 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = [
-  "http://localhost:5173",            // local frontend
-  "https://your-frontend.vercel.app" // replace with actual Vercel URL
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error("Not allowed by CORS"));
-    },
+    origin: [
+      "http://localhost:5173",
+      "https://internship-project-1-theta.vercel.app"
+    ],
     credentials: true
   })
 );
 
 app.use(helmet());
+
 app.use(
   rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 1000,
     max: 1000
   })
 );
 
-/* ===== Database ===== */
+/* ===== DB ===== */
 connectDB();
 
 /* ===== Routes ===== */
 app.use("/api/auth", require("./routes/authRoutes"));
 
+/* ===== Health Check ===== */
+app.get("/", (req, res) => {
+  res.send("API running 🚀");
+});
+
 /* ===== Server ===== */
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
